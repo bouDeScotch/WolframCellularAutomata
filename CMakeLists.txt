@@ -4,7 +4,7 @@ project(WolframCellularAutomata)
 set(CMAKE_CXX_STANDARD 17)
 
 # Add the path to the SFML include directory and the SFML library directory
-set(SFML_ROOT "Libs/SFML/include")
+set(SFML_ROOT "D:/SFML")
 include_directories(${SFML_ROOT}/include)
 link_directories(${SFML_ROOT}/lib)
 
