@@ -1,12 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <chrono>
+#include <random>
 
-#define WINDOW_WIDTH 1000
-#define WINDOW_HEIGHT 500
-#define HEIGHT 100
+
+#define WINDOW_HEIGHT 750
+#define WINDOW_WIDTH (WINDOW_HEIGHT*2+1)
+#define HEIGHT 750
 #define WIDTH (HEIGHT*2+1)
-#define RULESET 0b00011110
+#define RULESET 30
 
 
 // Convert the ruleset to a boolean array
@@ -25,9 +27,19 @@ int currentLine = 0;
 
 // Create a random WIDTH length array of boolean
 void randomize() {
+    std::random_device rd {};
+    std::mt19937 mt(rd());
+    std::uniform_int_distribution<int> dist(0, 1);
+
     for (int i = 0; i < WIDTH; i++) {
-        grid[i][0] = rand() % 2;
+        grid[i][0] = dist(mt);
     }
+
+    // Just one cell in the middle
+    for (int i = 0; i < WIDTH; i++) {
+        grid[i][0] = false;
+    }
+    grid[WIDTH/2][0] = true;
 }
 
 // Fonction de configuration
@@ -38,35 +50,31 @@ void setup() {
             grid[i][j] = false;
         }
     }
-     randomize();
+    randomize();
     // Création de la fenêtre
     window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Deplacement de carre");
 }
 
 
 void draw() {
-    // Effacement de la fenêtre
     window.clear();
 
-    // Fond blanc
     sf::RectangleShape rectangle(sf::Vector2f(WINDOW_WIDTH, WINDOW_HEIGHT));
-    rectangle.setPosition(sf::Vector2f(0, 0));
     rectangle.setFillColor(sf::Color::White);
     window.draw(rectangle);
 
-    auto start = std::chrono::high_resolution_clock::now();
+    sf::RectangleShape cell(sf::Vector2f(WINDOW_WIDTH / WIDTH, WINDOW_HEIGHT / HEIGHT));
+    cell.setFillColor(sf::Color::Black);
+
     for (int w = 0; w < WIDTH; w++) {
         for (int h = currentLine; h < HEIGHT; h++) {
             if (grid[w][h]) {
-                sf::RectangleShape rectangle(sf::Vector2f(WINDOW_WIDTH / WIDTH, WINDOW_HEIGHT / HEIGHT));
-                rectangle.setPosition(sf::Vector2f(w * WINDOW_WIDTH / WIDTH, h * WINDOW_HEIGHT / HEIGHT));
-                rectangle.setFillColor(sf::Color::Black);
-                window.draw(rectangle);
+                cell.setPosition(sf::Vector2f(w * WINDOW_WIDTH / WIDTH, h * WINDOW_HEIGHT / HEIGHT));
+                window.draw(cell);
             }
         }
     }
 
-    // Affichage du contenu de la fenêtre
     window.display();
 }
 
@@ -79,7 +87,12 @@ bool findVal(const bool neighbour[3]) {
 }
 
 void compute() {
+    randomize();
+
+    float totalTime = 0;
+#pragma omp parallel for
     for (int height = 1; height < HEIGHT; height++) {
+        auto start = std::chrono::high_resolution_clock::now();
         for (int width = 0; width < WIDTH; width++) {
             bool neighbours[3];
             if (width == 0) {
@@ -98,6 +111,8 @@ void compute() {
 
             grid[width][height] = findVal(neighbours);
         }
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start);
+        totalTime += duration.count();
         draw();
     }
 }
@@ -105,7 +120,6 @@ void compute() {
 int main() {
     convertRuleset();
     setup();
-    randomize();
 
     auto start = std::chrono::high_resolution_clock::now();
     compute();
@@ -124,5 +138,5 @@ int main() {
         draw();
     }
 
-    return 0;
+    return 666;
 }
