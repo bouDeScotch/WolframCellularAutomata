@@ -6,9 +6,10 @@
 
 #define WINDOW_HEIGHT 750
 #define WINDOW_WIDTH (WINDOW_HEIGHT*2+1)
-#define HEIGHT 750
+#define HEIGHT 200
 #define WIDTH (HEIGHT*2+1)
-#define RULESET 30
+#define RANDOMIZE false
+#define RULESET 182
 
 
 // Convert the ruleset to a boolean array
@@ -27,15 +28,17 @@ int currentLine = 0;
 
 // Create a random WIDTH length array of boolean
 void randomize() {
-    std::random_device rd {};
-    std::mt19937 mt(rd());
-    std::uniform_int_distribution<int> dist(0, 1);
+    if (RANDOMIZE) {
+        std::random_device rd{};
+        std::mt19937 mt(rd());
+        std::uniform_int_distribution<int> dist(0, 1);
 
-    for (int i = 0; i < WIDTH; i++) {
-        grid[i][0] = dist(mt);
+        for (int i = 0; i < WIDTH; i++) {
+            grid[i][0] = dist(mt);
+        }
+        return;
     }
 
-    // Just one cell in the middle
     for (int i = 0; i < WIDTH; i++) {
         grid[i][0] = false;
     }
