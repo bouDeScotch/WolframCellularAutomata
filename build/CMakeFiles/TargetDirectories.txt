@@ -1,3 +1,0 @@
-/home/runner/work/WolframCellularAutomata/WolframCellularAutomata/build/CMakeFiles/WolframCellularAutomata.dir
-/home/runner/work/WolframCellularAutomata/WolframCellularAutomata/build/CMakeFiles/edit_cache.dir
-/home/runner/work/WolframCellularAutomata/WolframCellularAutomata/build/CMakeFiles/rebuild_cache.dir

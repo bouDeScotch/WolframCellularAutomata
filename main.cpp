@@ -2,6 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <random>
+#include <cmath>
 
 
 #define WINDOW_HEIGHT 750
@@ -66,13 +67,20 @@ void draw() {
     rectangle.setFillColor(sf::Color::White);
     window.draw(rectangle);
 
-    sf::RectangleShape cell(sf::Vector2f(WINDOW_WIDTH / WIDTH, WINDOW_HEIGHT / HEIGHT));
+    // Calculate cell dimensions with slight overlap to eliminate gaps
+    float cellWidth = static_cast<float>(WINDOW_WIDTH) / WIDTH + 0.5f;  // Add small overlap
+    float cellHeight = static_cast<float>(WINDOW_HEIGHT) / HEIGHT + 0.5f;  // Add small overlap
+    
+    sf::RectangleShape cell(sf::Vector2f(cellWidth, cellHeight));
     cell.setFillColor(sf::Color::Black);
 
     for (int w = 0; w < WIDTH; w++) {
         for (int h = currentLine; h < HEIGHT; h++) {
             if (grid[w][h]) {
-                cell.setPosition(sf::Vector2f(w * WINDOW_WIDTH / WIDTH, h * WINDOW_HEIGHT / HEIGHT));
+                // Calculate exact position using floating point but rounded for pixel alignment
+                float posX = std::round(static_cast<float>(w * WINDOW_WIDTH) / WIDTH);
+                float posY = std::round(static_cast<float>(h * WINDOW_HEIGHT) / HEIGHT);
+                cell.setPosition(sf::Vector2f(posX, posY));
                 window.draw(cell);
             }
         }
